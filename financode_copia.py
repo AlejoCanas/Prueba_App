@@ -44,7 +44,8 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 import datetime
-import plotly.graph_objects as go # Usaremos Plotly para mejores gráficos
+import plotly.graph_objects as go 
+# Usaremos Plotly para mejores gráficos
 
 # --- CONFIGURACIÓN DE PÁGINA ---
 # (Asegúrate de que esta sea la primera comando de Streamlit)
