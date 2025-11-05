@@ -62,7 +62,7 @@ def get_data(tickers, start_date, end_date, benchmark_ticker="^GSPC"):
     Se asegura de que tanto asset_data como benchmark_data sean DataFrames.
     """
     all_tickers = tickers + [benchmark_ticker]
-    data = yf.download(all_tickers, start=start_date, end=end_date)['Adj Close']
+    data = yf.download(all_tickers, start=start_date, end=end_date)['Close']
     
     # Asegurarse de que 'data' sea un DataFrame
     if isinstance(data, pd.Series):
