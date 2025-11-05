@@ -21,10 +21,9 @@ import pandas as pd
 import numpy as np
 import datetime
 import plotly.graph_objects as go
-import altair as alt # Importación necesaria para el gráfico de Riesgo-Retorno
+import altair as alt
 
 # --- CONFIGURACIÓN DE PÁGINA ---
-# (Asegúrate de que esta sea la primera comando de Streamlit)
 st.set_page_config(
     page_title="FinanCode",
     page_icon="💰",
@@ -33,7 +32,6 @@ st.set_page_config(
 )
 
 # --- IMPORTANTE: INICIALIZACIÓN DE st.session_state ---
-# Esto es crucial para que la app funcione entre pestañas
 if 'perfil' not in st.session_state:
     st.session_state.perfil = None
 
@@ -54,14 +52,15 @@ with st.sidebar:
     st.markdown("*Desarrollado por: Alejandro Cañas, Emmanuel García, Maricielo Gómez*")
 
 
-# --- DEFINICIÓN DE FUNCIONES DE CÁLCULO (Se mueven aquí para mayor claridad) ---
+# --- DEFINICIÓN DE FUNCIONES DE CÁLCULO ---
 
 def get_data(tickers, start_date, end_date, benchmark_ticker="^GSPC"):
     """
-    Descarga datos de precios de cierre ajustados.
+    Descarga datos de precios de CIERRE (Close).
     Se asegura de que tanto asset_data como benchmark_data sean DataFrames.
     """
     all_tickers = tickers + [benchmark_ticker]
+    # CAMBIO A SOLAMENTE 'Close'
     data = yf.download(all_tickers, start=start_date, end=end_date)['Close']
     
     # Asegurarse de que 'data' sea un DataFrame
@@ -69,7 +68,6 @@ def get_data(tickers, start_date, end_date, benchmark_ticker="^GSPC"):
         data = data.to_frame(name=all_tickers[0])
 
     # Separar activos y benchmark usando corchetes dobles para mantener el formato DataFrame
-    # Esto corrige el error 'DataFrame' object has no attribute 'to_frame'
     benchmark_data = data[[benchmark_ticker]].dropna()
     asset_data = data[tickers].dropna()
     
@@ -79,10 +77,7 @@ def calculate_beta(asset_returns, benchmark_returns):
     """Calcula beta para cada activo contra el benchmark."""
     betas = {}
     
-    # Asegurar que benchmark_returns sea una Serie para el cálculo
     bench_series = benchmark_returns.iloc[:, 0]
-    
-    # Alineamos los índices
     aligned_assets, aligned_bench = asset_returns.align(bench_series, join='inner', axis=0)
 
     if aligned_assets.empty:
@@ -229,9 +224,8 @@ elif seleccion == "Análisis de Portafolio":
         if not tickers:
             st.warning("Por favor, ingrese al menos un ticker.")
         else:
-            # Distribución dinámica de columnas para pesos
             num_tickers = len(tickers)
-            max_cols = 5 # Límite para evitar demasiadas columnas pequeñas
+            max_cols = 5 
             cols = st.columns(min(num_tickers, max_cols))
             
             default_weight = 100.0 / num_tickers
@@ -246,7 +240,7 @@ elif seleccion == "Análisis de Portafolio":
                         value=default_weight, 
                         step=0.1,
                         format="%.2f",
-                        key=f"weight_{ticker}" # Clave única necesaria en bucles
+                        key=f"weight_{ticker}" 
                     )
                     pesos_pct.append(peso_individual)
 
@@ -274,7 +268,7 @@ elif seleccion == "Análisis de Portafolio":
                 "Tasa Libre de Riesgo (Anual)",
                 min_value=0.0,
                 max_value=1.0,
-                value=0.04, # 4% por defecto
+                value=0.04, 
                 step=0.005,
                 format="%.3f",
                 help="Tasa de referencia (ej: Bonos del Tesoro) para calcular el Ratio de Sharpe."
@@ -295,7 +289,7 @@ elif seleccion == "Análisis de Portafolio":
         start_date = d[0]
         end_date = d[1]
         
-        MARKET_TICKER = "^GSPC" # S&P 500
+        MARKET_TICKER = "^GSPC" 
         st.markdown("---")
 
         # --- BOTÓN DE EJECUCIÓN ---
@@ -311,10 +305,8 @@ elif seleccion == "Análisis de Portafolio":
             
             with st.spinner("Descargando datos y calculando métricas..."):
                 
-                # Normalizar pesos a decimal
                 pesos = np.array(pesos_pct) / 100.0
                 
-                # --- Ejecución de Cálculos ---
                 try:
                     datos, benchmark_data = get_data(tickers, start_date, end_date, MARKET_TICKER)
 
@@ -326,7 +318,6 @@ elif seleccion == "Análisis de Portafolio":
                     retornos = datos.pct_change().dropna()
                     benchmark_retornos = benchmark_data.pct_change().dropna()
                     
-                    # Asegurar alineación de retornos
                     retornos_aligned, benchmark_retornos_aligned = retornos.align(benchmark_retornos.iloc[:, 0], join='inner', axis=0)
                     
                     if retornos_aligned.empty:
@@ -342,7 +333,6 @@ elif seleccion == "Análisis de Portafolio":
 
                     # CAPM y Beta
                     betas = calculate_beta(retornos_aligned, benchmark_retornos_df)
-                    # Solución para Rm: Usar .values.mean() o .iloc[:, 0].mean()
                     Rm = benchmark_retornos.values.mean() * 252
                     retorno_capm_series = pd.Series({t: RF + beta * (Rm - RF) for t, beta in betas.items()})
 
@@ -383,6 +373,7 @@ elif seleccion == "Análisis de Portafolio":
                         st.line_chart(retornos_acum_p)
 
                         st.subheader("Diagrama Riesgo-Retorno")
+                        
                         # Crear DataFrame para el gráfico
                         df_riesgo_retorno = pd.DataFrame({
                             'Retorno': retorno_anual_ind, 
@@ -397,22 +388,25 @@ elif seleccion == "Análisis de Portafolio":
                         }
                         df_riesgo_retorno = df_riesgo_retorno.reset_index().rename(columns={'index': 'Activo'})
                         
-                        # --- SOLUCIÓN AL ERROR DE TOOLTIP con st.altair_chart ---
+                        # SOLUCIÓN AL ERROR: Forzar 'Activo' a ser string (Nominal) para Altair
+                        df_riesgo_retorno['Activo'] = df_riesgo_retorno['Activo'].astype(str)
+                        
+                        # Gráfico Altair con Tooltips
                         chart = alt.Chart(df_riesgo_retorno).mark_circle(size=100).encode(
                             # Ejes
                             x=alt.X('Volatilidad', axis=alt.Axis(format='.2%', title='Volatilidad Anualizada (Riesgo)')),
                             y=alt.Y('Retorno', axis=alt.Axis(format='.2%', title='Retorno Anualizado')),
                             
-                            # Color y Tooltip (Aceptados por Altair)
+                            # Color y Tooltip
                             color='Tipo',
                             tooltip=[
-                                'Activo', 
-                                alt.Tooltip('Volatilidad', format='.2%'), 
-                                alt.Tooltip('Retorno', format='.2%')
+                                alt.Tooltip('Activo', title='Ticker'), # Usar un título más amigable
+                                alt.Tooltip('Volatilidad', format='.2%', title='Volatilidad'), 
+                                alt.Tooltip('Retorno', format='.2%', title='Retorno')
                             ]
                         ).properties(
                             title='Comparación Riesgo-Retorno (Activos vs. Portafolio)'
-                        ).interactive() # Permite zoom y paneo
+                        ).interactive()
 
                         st.altair_chart(chart, use_container_width=True)
                         st.caption("Nota: 'Mi Portafolio' muestra el riesgo y retorno combinados según los pesos asignados.")
@@ -438,7 +432,6 @@ elif seleccion == "Análisis de Portafolio":
 
                 except Exception as e:
                     st.error(f"Ocurrió un error durante la simulación: {e}")
-                    # Descomentar la siguiente línea para ver detalles completos en los logs de Streamlit
                     # st.exception(e)
 
 
