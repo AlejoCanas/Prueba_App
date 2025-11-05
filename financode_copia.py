@@ -132,3 +132,4 @@ if seleccion == "Inicio":
         * **✅ Evolución del valor monetario:** Mostrado en métrica y gráfico.
 
         #### 4. Fuente de Datos y Lenguaje
+        """)
