@@ -32,7 +32,7 @@ with st.sidebar:
     st.title("FinanCode 1.0")
     seleccion = st.radio(
         "Menú de navegación",
-        ["Inicio", "Perfil de inversor", "Análisis de Portafolio", "Configuración"],
+        ["Inicio", "Perfil de inversor", "Análisis de Portafolio"],
         captions=[
             "Bienvenida",
             "Define tu tolerancia al riesgo",
