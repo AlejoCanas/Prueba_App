@@ -29,7 +29,7 @@ if 'perfil' not in st.session_state:
 
 # --- BARRA LATERAL (SIDEBAR) ---
 with st.sidebar:
-    st.title("FinanCode 1.0")
+    st.title("FinanCode")
     seleccion = st.radio(
         "Menú de navegación",
         ["Inicio", "Perfil de inversor", "Análisis de Portafolio"],
