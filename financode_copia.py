@@ -102,42 +102,6 @@ if seleccion == "Inicio":
     cumpliendo con los requisitos clave del análisis financiero.
     """)
     
-    st.subheader("Requisitos Cumplidos (según especificaciones):")
-    
-    col_req1, col_req2 = st.columns(2)
-    
-    with col_req1:
-        # PRIMER BLOQUE: CERRADO CORRECTAMENTE
-        st.markdown("""
-        #### 1. Entradas de Usuario
-        * **✅ Selección de empresas:** Ingresa múltiples tickers (ej: AAPL, MSFT).
-        * **✅ Pesos del portafolio:** Asigna un peso porcentual a cada activo.
-        * **✅ Inversión inicial:** Define el monto monetario para la simulación.
-        * **✅ Periodo de análisis:** Selecciona fecha de inicio y fin.
-        * **✅ Tasa Libre de Riesgo:** Ajusta el 'Risk-Free Rate' para el Sharpe Ratio.
-
-        #### 2. Visualizaciones
-        * **✅ Serie de tiempo de precios:** Gráfico de precios normalizados.
-        * **✅ Retornos acumulados:** Gráfico de retornos acumulados del portafolio.
-        * **✅ Evolución del valor monetario:** Gráfico del valor de tu inversión.
-        * **✅ Diagrama riesgo-retorno:** Compara activos vs. portafolio.
-        * **✅ Benchmark (Opcional):** Métricas Beta vs. S&P 500.
-        """)
-        
-    with col_req2:
-        # SEGUNDO BLOQUE: CERRADO CORRECTAMENTE
-        st.markdown("""
-        #### 3. Resultados Mínimos
-        * **✅ Retornos por periodo y acumulados:** Calculados para el portafolio.
-        * **✅ Volatilidad histórica y anualizada:** Calculada para el portafolio.
-        * **✅ Sharpe ratio:** Calculado para el portafolio.
-        * **✅ Evolución del valor monetario:** Mostrado en métrica y gráfico.
-
-        #### 4. Fuente de Datos y Lenguaje
-        * **✅ Lenguaje:** Python (Streamlit).
-        * **✅ Fuente de datos:** API de Yahoo Finance (`yfinance`).
-        """)
-
 elif seleccion == "Perfil de inversor":
     # 🧭 CUESTIONARIO DE PERFIL
     st.title("🧩 Cuestionario del inversor")
