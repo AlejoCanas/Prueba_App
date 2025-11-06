@@ -23,14 +23,6 @@ import datetime
 import plotly.graph_objects as go
 import altair as alt # Necesario para la gráfica avanzada de riesgo-retorno
 
-# --- CONFIGURACIÓN DE PÁGINA ---
-st.set_page_config(
-    page_title="FinanCode",
-    page_icon="💰",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
-
 # --- IMPORTANTE: INICIALIZACIÓN DE st.session_state ---
 if 'perfil' not in st.session_state:
     st.session_state.perfil = None
